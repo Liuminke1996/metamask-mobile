@@ -366,7 +366,7 @@ const App = ({ userLoggedIn }) => {
           }}
         >
           <Stack.Navigator
-            initialRouteName={route}
+            initialRouteName={Routes.VAULT_RECOVERY.ID}
             mode={'modal'}
             screenOptions={{
               headerShown: false,
