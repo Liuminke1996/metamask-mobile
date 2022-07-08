@@ -12,6 +12,7 @@ const RememberMeOptionSection = () => {
   const allowLoginWithRememberMe = useSelector(
     (state: any) => state.security.allowLoginWithRememberMe,
   );
+
   const [isUsingRememberMe, setIsUsingRememberMe] = useState<boolean>(false);
   useEffect(() => {
     const checkIfAlreadyUsingRememberMe = async () => {

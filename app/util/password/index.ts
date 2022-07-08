@@ -37,7 +37,7 @@ export const doesPasswordMatch = async (
       try {
         // then we verify if the stored password matches the one that can decrypt the vault
         const { KeyringController } = Engine.context as any;
-        await KeyringController.submitPassword(credentials.password);
+        await KeyringController.exportSeedPhrase(credentials.password);
         // now that we are confident that the user is logged in, we can test that the input matches
         if (input === credentials.password) {
           return {
