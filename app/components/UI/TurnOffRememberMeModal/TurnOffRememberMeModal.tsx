@@ -14,6 +14,7 @@ import { logOut } from '../../../actions/user';
 import { setAllowLoginWithRememberMe } from '../../../actions/security';
 import { useDispatch } from 'react-redux';
 import SecureKeychain from '../../../core/SecureKeychain';
+import debounce from 'lodash/debounce';
 
 export const createTurnOffRememberMeModalNavDetails = createNavigationDetails(
   Routes.MODAL.ROOT_MODAL_FLOW,
@@ -38,7 +39,10 @@ const TurnOffRememberMeModal = () => {
   const checkPassword = useCallback(
     async (text: string) => {
       setPasswordText(text);
-      setDisableButton(!(await isValidPassword(text)));
+      debounce(
+        async () => setDisableButton(!(await isValidPassword(text))),
+        200,
+      );
     },
     [isValidPassword],
   );
