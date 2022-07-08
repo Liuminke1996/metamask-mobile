@@ -46,6 +46,8 @@ const TurnOffRememberMeModal = () => {
   const dismissModal = (cb?: () => void): void =>
     modalRef?.current?.dismissModal(cb);
 
+  const triggerClose = () => dismissModal();
+
   const turnOffRememberMeAndLockApp = async () => {
     const { KeyringController } = Engine.context as any;
     await SecureKeychain.resetGenericPassword();
@@ -65,8 +67,8 @@ const TurnOffRememberMeModal = () => {
         cancelText={strings('turn_off_remember_me.action')}
         cancelButtonDisabled={disableButton}
         onCancelPress={disableRememberMe}
-        onRequestClose={dismissModal}
-        onConfirmPress={dismissModal}
+        onRequestClose={triggerClose}
+        onConfirmPress={triggerClose}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.areYouSure}>
