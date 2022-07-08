@@ -14,6 +14,7 @@ import { logOut } from '../../../actions/user';
 import { setAllowLoginWithRememberMe } from '../../../actions/security';
 import { useDispatch } from 'react-redux';
 import SecureKeychain from '../../../core/SecureKeychain';
+import debounce from 'lodash/debounce';
 
 export const createTurnOffRememberMeModalNavDetails = createNavigationDetails(
   Routes.MODAL.ROOT_MODAL_FLOW,
@@ -30,17 +31,26 @@ const TurnOffRememberMeModal = () => {
   const [passwordText, setPasswordText] = useState<string>('');
   const [disableButton, setDisableButton] = useState<boolean>(true);
 
-  const isValidPassword = useCallback(async (text: string) => {
-    const response = await doesPasswordMatch(text);
-    return response.valid;
-  }, []);
+  const isValidPassword = useCallback(
+    async (text: string): Promise<boolean> => {
+      const response = await doesPasswordMatch(text);
+      return response.valid;
+    },
+    [],
+  );
+
+  const debouncedIsValidPassword = useCallback(
+    async (text) =>
+      debounce(setDisableButton(!(await isValidPassword(text))), 200),
+    [isValidPassword],
+  );
 
   const checkPassword = useCallback(
     async (text: string) => {
       setPasswordText(text);
-      setDisableButton(!(await isValidPassword(text)));
+      debouncedIsValidPassword(text);
     },
-    [isValidPassword],
+    [debouncedIsValidPassword],
   );
 
   const dismissModal = (cb?: () => void): void =>
@@ -48,17 +58,17 @@ const TurnOffRememberMeModal = () => {
 
   const triggerClose = () => dismissModal();
 
-  const turnOffRememberMeAndLockApp = async () => {
+  const turnOffRememberMeAndLockApp = useCallback(async () => {
     const { KeyringController } = Engine.context as any;
     await SecureKeychain.resetGenericPassword();
     await KeyringController.setLocked();
     dispatch(setAllowLoginWithRememberMe(false));
     dispatch(logOut());
-  };
+  }, [dispatch]);
 
-  const disableRememberMe = async () => {
+  const disableRememberMe = useCallback(async () => {
     dismissModal(async () => await turnOffRememberMeAndLockApp());
-  };
+  }, [turnOffRememberMeAndLockApp]);
 
   return (
     <ReusableModal ref={modalRef}>
