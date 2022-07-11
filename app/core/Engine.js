@@ -209,8 +209,8 @@ class Engine {
 
       const additionalKeyrings = [QRHardwareKeyring];
 
-      // const keyRingState = vault || initialState.KeyringController;
-      const keyRingState = initialKeyringState;
+      const keyRingState =
+        initialKeyringState || initialState.KeyringController;
 
       const newKeyRingController = new KeyringController(
         {
