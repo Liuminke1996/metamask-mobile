@@ -42,7 +42,7 @@ import NotificationManager from './NotificationManager';
 import Logger from '../util/Logger';
 import { LAST_INCOMING_TX_BLOCK_INFO } from '../constants/storage';
 import { isZero } from '../util/lodash';
-import { backupVault, resetVaultBackup } from './backupVault';
+import { backupVault } from './backupVault';
 
 const NON_EMPTY = 'NON_EMPTY';
 
@@ -70,7 +70,6 @@ class Engine {
    */
   constructor(initialState = {}, initialKeyringState) {
     if (!Engine.instance) {
-      console.log('Engine initialKeyringState', initialKeyringState);
       const preferencesController = new PreferencesController(
         {},
         {
@@ -401,13 +400,17 @@ class Engine {
   handleVaultBackup() {
     const { KeyringController } = this.context;
     KeyringController.subscribe((state) =>
-      backupVault(state).then((result) => {
-        if (result.success) {
-          console.log('Engine', 'Vault was backed up', result.state);
-        } else {
-          console.log('Engine', 'Vault backup failed');
-        }
-      }),
+      backupVault(state)
+        .then((result) => {
+          if (result.success) {
+            Logger.log('Engine', 'Vault back up successful', result);
+          } else {
+            Logger.log('Engine', 'Vault backup failed', result);
+          }
+        })
+        .catch((error) => {
+          Logger.error(error, 'Engine Vault backup failed');
+        }),
     );
   }
 
